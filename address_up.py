@@ -30,7 +30,7 @@ conn3 = pymysql.connect(
 # )
 
 # 读取Excel中B列A端标准地址信息
-df = pandas.read_excel('./标准地址导入模板.xlsx', usecols=[1], names=None)
+df = pandas.read_excel('./标准地址导入模板.        xlsx', usecols=[1], names=None)
 # 读取数据中为空的nan替换成None
 # df[pandas.isna(df)] = None
 df.fillna('None', inplace=True)
