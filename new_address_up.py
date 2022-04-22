@@ -8,10 +8,10 @@ a = open("./insert_address.sql", "w")
 sys.stdout = a
 
 # 配置数据库连接信息
-conn3 = pymysql.connect(host='localhost', port=3306, database='test', user='root', password='root', charset='utf8', autocommit=True)
-# conn3 = pymysql.connect(host='10.30.107.152', port=3810, database='nc_resource', user='nc_resource_user', password='Li_9n8xTa6', charset='utf8', autocommit=True)
+# conn3 = pymysql.connect(host='localhost', port=3306, database='test', user='root', password='root', charset='utf8', autocommit=True)
+conn3 = pymysql.connect(host='10.30.107.152', port=3810, database='nc_resource', user='nc_resource_user', password='Li_9n8xTa6', charset='utf8', autocommit=True)
 # pandas读取Excel中A端标准地址信息
-A = pandas.read_excel('C:\\Users\\HongBingHu\\Desktop\\标准地址导入模板.xlsx', usecols=[1], names=None)
+A = pandas.read_excel('./标准地址导入模板.xlsx', usecols=[1], names=None)
 # 读取到的控制替换成None
 A.fillna('None', inplace=True)
 # 读取结果存入list
@@ -31,7 +31,7 @@ for i in a_res:
     A_chaxun.append(list(i))
 # --------------------------------以上以列表的形式返回A端标准地址在数据中存在的数据---------------------------------------------
 # 读取AB列数据存入列表AB[]
-AB = pandas.read_excel('C:\\Users\\HongBingHu\\Desktop\\标准地址导入模板.xlsx', usecols=[0, 1], names=None)
+AB = pandas.read_excel('./标准地址导入模板.xlsx', usecols=[0, 1], names=None)
 # 替换Excel中的空值
 AB.fillna('', inplace=True)
 # 返回list结构值,将AB列数据存入列表中
@@ -73,7 +73,7 @@ print('-- ----------------------------------------------------------------------
 # -------------------------------------------------计算Z端信息-------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------
 # pandas读取Excel中Z端标准地址信息
-Z = pandas.read_excel('C:\\Users\\HongBingHu\\Desktop\\标准地址导入模板.xlsx', usecols=[2], names=None)
+Z = pandas.read_excel('./标准地址导入模板.xlsx', usecols=[2], names=None)
 # 读取到的空数据替换成None
 Z.fillna('None', inplace=True)
 # 读取结果存入list
@@ -93,7 +93,7 @@ for i in Z_res:
     Z_chaxun.append(list(i))
 # --------------------------------以上以列表的形式返回z端标准地址在数据中存在的数据---------------------------------------------
 # 读取AB列数据存入列表AC[]
-AC = pandas.read_excel('C:\\Users\\HongBingHu\\Desktop\\标准地址导入模板.xlsx', usecols=[0, 2], names=None)
+AC = pandas.read_excel('./标准地址导入模板.xlsx', usecols=[0, 2], names=None)
 # 替换Excel中的空值
 AC.fillna('', inplace=True)
 # 返回list结构值,将AC列数据存入列表中
@@ -131,7 +131,7 @@ for i in Z_chaxun:
             Z_cp_list.remove(j)
     zsc()
 # --------------------------------------------------------------------------------------------------------------
-pd = pandas.read_excel('C:\\Users\\HongBingHu\\Desktop\\标准地址导入模板.xlsx', usecols='A:C', names=None)
+pd = pandas.read_excel('./标准地址导入模板.xlsx', usecols='A:C', names=None)
 pd.fillna('', inplace=True)
 pdlist = pd.values.tolist()
 # --------------------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ form_header4 = ['产品实例标识', 'Z端标准地址']
 pandas.DataFrame(pdlist, columns=form_header).to_excel(lujin, sheet_name='基础数据', index=None)
 pandas.DataFrame(A_exists, columns=form_header1).to_excel(lujin, sheet_name='A端标准地址已更新数据', index=None)
 pandas.DataFrame(A_cp_list, columns=form_header2).to_excel(lujin, sheet_name='A端标准地址不存在数据', index=None)
-pandas.DataFrame(Z_exists, columns=form_header1).to_excel(lujin, sheet_name='Z端标准地址已更新数据', index=None)
-pandas.DataFrame(Z_cp_list, columns=form_header2).to_excel(lujin, sheet_name='Z端标准地址不存在数据', index=None)
+pandas.DataFrame(Z_exists, columns=form_header3).to_excel(lujin, sheet_name='Z端标准地址已更新数据', index=None)
+pandas.DataFrame(Z_cp_list, columns=form_header4).to_excel(lujin, sheet_name='Z端标准地址不存在数据', index=None)
 
 lujin.save()
