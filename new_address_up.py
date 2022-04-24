@@ -3,7 +3,7 @@ import pandas
 import time
 import sys
 
-# open为内置函数，w参数是为了打开文件的写权限
+# open为内置函数，w参数是为了打开文件的写的权限
 a = open("./insert_address.sql", "w")
 sys.stdout = a
 
