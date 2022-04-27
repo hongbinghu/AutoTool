@@ -8,7 +8,7 @@ a = open("./insert_address.sql", "w")
 sys.stdout = a
 
 # 配置数据库连接信息
-# conn3 = pymysql.connect(host='localhost', port=3306, database='test', user='root', password='root', charset='utf8', autocommit=True)
+# conn3 = pymysql.connect(host='localhost', port=3306, database='nc_resource', user='root', password='root', charset='utf8', autocommit=True)
 conn3 = pymysql.connect(host='10.30.107.152', port=3810, database='nc_resource', user='nc_resource_user', password='Li_9n8xTa6', charset='utf8', autocommit=True)
 # pandas读取Excel中A端标准地址信息
 A = pandas.read_excel('./标准地址导入模板.xlsx', usecols=[1], names=None)
@@ -21,7 +21,7 @@ A_new_list = []
 for i in A_list:
     A_new_list.append(i[0])
 # 查询标准地址在数据库中是否存在
-sql_1 = '''SELECT NAME,UUID FROM address WHERE NAME in %s'''
+sql_1 = '''SELECT tt.name,tt.uuid FROM (SELECT NAME,UUID,row_number() OVER (PARTITION BY NAME) AS bm FROM address WHERE NAME IN %s)tt WHERE tt.bm = 1'''
 cursor = conn3.cursor()
 cursor.execute(sql_1, [A_new_list])
 a_res = cursor.fetchall()
@@ -69,7 +69,6 @@ for i in A_chaxun:
             A_cp_list.remove(j)
     sc()
 # --------------------------------------------------------------------------------------------------------------
-print('-- -------------------------------------------------------------------------------------------')
 # -------------------------------------------------计算Z端信息-------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------
 # pandas读取Excel中Z端标准地址信息
@@ -83,7 +82,7 @@ Z_new_list = []
 for i in Z_list:
     Z_new_list.append(i[0])
 # 查询标准地址在数据库中是否存在
-sql_2 = '''SELECT NAME,UUID FROM address WHERE NAME in %s'''
+sql_2 = '''SELECT tt.name,tt.uuid FROM (SELECT NAME,UUID,row_number() OVER (PARTITION BY NAME) AS bm FROM address WHERE NAME IN %s)tt WHERE tt.bm = 1'''
 cursor = conn3.cursor()
 cursor.execute(sql_2, [Z_new_list])
 Z_res = cursor.fetchall()
@@ -116,7 +115,8 @@ for i in Z_exists:
 for i in Z_exists:
     sql_Z = "UPDATE design d SET d.standard_address='%s',d.address_uuid='%s' WHERE d.uuid = (SELECT real_connectivity_uuid FROM product p,connectivity c WHERE p.uuid = c.service_uuid AND c.service_type=1 AND p.product_code='%s' AND p.direction=2);" % (i[1], i[2], i[0])
     print(sql_Z, file=a)
-# ---------------------------------以下开始判断Excel中Z端标准地址不存在存在的数据---------------------------------------------
+# ------------------------
+# ---------以下开始判断Excel中Z端标准地址不存在存在的数据---------------------------------------------
 # 将ExcelAC列数据复制一份,Z_chaxun为标准地址在存量中存在
 # 复制一份AB列数据
 Z_cp_list = AC_list
