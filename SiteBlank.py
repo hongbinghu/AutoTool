@@ -88,5 +88,6 @@ for i in tncm_site_tuple:
     if row1 == 0 or row2 == 0:
         result.append(list(i))
 print("-------------------------传输电路所属站点信息在资源库不存在数据----------------------------", file=doc)
+print("-- SELECT c.name,c.`a_site_uuid`,c.`a_zd_site_uuid`,c.`z_site_uuid`,c.`z_zd_site_uuid` FROM circuit c WHERE NAME IN ()", file=doc)
 for i in result:
     print(i, file=doc)
