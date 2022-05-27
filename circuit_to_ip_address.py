@@ -4,10 +4,10 @@
 import pymysql
 import time
 # 配置数据库连接信息
-conn1 = pymysql.connect(host='localhost', port=3306, database='nc_resource', user='root', password='root', charset='utf8',autocommit=True)
-conn2 = pymysql.connect(host='localhost', port=3306, database='rc_tncm', user='root', password='root', charset='utf8',autocommit=True)
-# conn1 = pymysql.connect(host='10.30.107.152', port=3810, database='nc_resource', user='nc_resource_user', password='Li_9n8xTa6', charset='utf8', autocommit=True)
-# conn2 = pymysql.connect(host='10.30.107.156', port=3810, user='rc_tncm_user', password='W+R56Lr6Ky', database='rc_tncm', charset='utf8', autocommit=True)
+# conn1 = pymysql.connect(host='localhost', port=3306, database='nc_resource', user='root', password='root', charset='utf8',autocommit=True)
+# conn2 = pymysql.connect(host='localhost', port=3306, database='rc_tncm', user='root', password='root', charset='utf8',autocommit=True)
+conn1 = pymysql.connect(host='10.30.107.152', port=3810, database='nc_resource', user='nc_resource_user', password='Li_9n8xTa6', charset='utf8', autocommit=True)
+conn2 = pymysql.connect(host='10.30.107.156', port=3810, user='rc_tncm_user', password='W+R56Lr6Ky', database='rc_tncm', charset='utf8', autocommit=True)
 
 sql_1 = '''select uuid from nc_resource.circuit_to_ip_address'''
 sql_2 = '''select uuid from rc_tncm.circuit_to_ip_address'''
@@ -84,7 +84,7 @@ ex_tncm = []
 for i in res1:
     ex_tncm.append(i[0])
 print('调度库与资源库电路名称不一致数量为%s' %len(ex_tncm))
-
+print('-------------------------------------------------------', file=doc)
 sql_33 = '''SELECT UUID,(SELECT NAME FROM rc_tncm.circuit WHERE UUID = cp.circuit_uuid) AS `circuit_name` FROM rc_tncm.circuit_to_ip_address cp where uuid in %s'''
 if len(ex_tncm) != 0:
     cursor2 = conn2.cursor()
@@ -92,6 +92,7 @@ if len(ex_tncm) != 0:
     findAll = cursor2.fetchall()
 # 执行更新sql
     for i in findAll:
+        print(i, file=doc)
         sql_44 = '''update circuit_to_ip_address set circuit_name = %s where uuid = %s'''
         cursor1 = conn1.cursor()
         cursor1.execute(sql_44, (i[1], i[0]))

@@ -8,7 +8,7 @@
 import pymysql
 import time
 st = time.strftime("%Y%m%d%H%M%S", time.localtime())
-doc = open('./' + st + 'delete_Port.log', 'w')
+doc = open('E:\\huhongbing\\A-自动化办公脚本\\清理重复端口\\' + st + 'delete_Port.log', 'w')
 # 1.配置资源库与调度库连接信息
 conn1 = pymysql.connect(host='10.30.107.152', port=3810, database='nc_resource', user='nc_resource_user', password='Li_9n8xTa6', charset='utf8', autocommit=True)
 conn2 = pymysql.connect(host='10.30.107.156', port=3810, user='rc_tncm_user', password='W+R56Lr6Ky', database='rc_tncm', charset='utf8', autocommit=True)
@@ -24,7 +24,13 @@ SELECT tp.uuid ,tp.name,tp.port_state ,tp.create_time ,tp.update_time ,tp.rmuid
 ,row_number()over(PARTITION BY tp.rmuid  ORDER BY tp.create_time DESC) rn
 FROM trans_port tp WHERE TP.fdn LIKE 'EMS=ENS-T31-1-P%' AND NAME LIKE '恩施%'
 ) tt WHERE tt.rn>1 AND tt.port_state=1
-LIMIT 0, 20000'''
+LIMIT 20000'''
+repeat1 = '''SELECT UUID FROM trans_port WHERE rmuid IN (
+SELECT tt.rmuid FROM (
+SELECT tp.uuid ,tp.name,tp.port_state ,tp.create_time ,tp.update_time ,tp.rmuid 
+,row_number()over(PARTITION BY tp.rmuid  ORDER BY tp.create_time DESC) rn
+FROM trans_port tp WHERE TP.fdn LIKE 'EMS=ENS-T31-1-P%' AND NAME LIKE '恩施%' AND tp.rmuid = ''
+) tt WHERE tt.rn>1)'''
 # 2.2查询端口是否有电路
 circuit = '''SELECT c.* FROM circuit c,circuit_route cr,route_to_service rts,otn_service os
 WHERE c.uuid = cr.circuit_uuid
@@ -71,7 +77,7 @@ AND mstp.service_type = 2
 AND mstp.service_uuid = os.uuid
 AND (os.orig1_port_uuid = %s OR os.orig2_port_uuid = %s OR os.dest_port_uuid = %s)'''
 # 2.3查询端口是否有光路
-optical_way = '''SELECT * FROM optical_link ol WHERE (start_port_uuid = %s OR end_port_uuid = %s)'''
+optical_way = '''SELECT * FROM optical_link  WHERE (start_port_uuid = %s OR end_port_uuid = %s)'''
 # 2.4执行删除
 delete = '''delete from trans_port where uuid = %s'''
 # 3.开始执行sql,查询rmuid为空是端口数量,存入列表
@@ -85,6 +91,7 @@ for i in result:
         blank_list.append(j)
 # 4.遍历列表,循环判断电路光路
 print("-----------------------------------正在查询端口是否有业务,请稍后!!!--------------------------------------")
+count = 0
 cursor2 = conn2.cursor()
 for i in blank_list:
     row1 = cursor2.execute(circuit, [i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i])
@@ -95,5 +102,7 @@ for i in blank_list:
         print('端口<'+i+'>端口已删除!!!')
         cursor1.execute(delete, i)
         print(i + ' --端口删除成功!', file=doc)
+        count = count + 1
+        print('已删除端口数:' + str(count))
     else:
         print('端口<'+i+'>有业务!!!')
